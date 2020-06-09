@@ -1,0 +1,517 @@
+请求成功返回2xx
+失败返回相应http code并附带错误字符串，当返回为401时，跳转到登录页面
+备份计划、备份历史及恢复历史列表均分页，通过?page=获取某页数据
+
+===========================================================
+事件		Event
+
+Server-Sent Event GET /api/event
+{
+  "type": 0x00(0),
+  "title": "title",
+  "message": "message"
+}
+0x0x表示 INFO
+0x2x表示 SUCCESS
+0x4x表示 WARING
+0x5x表示 ERROR
+
+===========================================================
+账户		Account
+
+----------------
+登录 GET /login?username=admin&password=admin(md5)
+response body
+一串token字符串
+
+----------------
+修改密码 PUT /api/account/{username}
+{
+  "new_password": "admin(md5)",
+  "old_password": "administrator(md5)"
+}
+
+---------------
+删除 DELETE /api/account/{username}
+
+---------------
+新增 POST /api/account
+{
+  "username": "user",
+  "password": "password"
+}
+
+
+===========================================================
+对象存储挂载点	Endpoint
+
+----------------
+新增 POST /api/endpoint
+request body
+{
+  "address": "127.0.0.1:7480",
+  "https": false,
+  "type": 0,
+  "display_name": "ceph"
+}
+
+----------------
+修改 PUT /api/endpoint/{address}
+request body
+{
+  "address": "192.168.1.101:7480",
+  "https": false,
+  "type": 0,
+  "display_name": "ceph"
+}
+
+----------------
+删除 DELETE /api/endpoint/{address(base64)}
+
+----------------
+列表 GET /api/endpoint
+[
+  {
+    "address": "127.0.0.1:7480",
+    "https": false,
+    "type": 0,
+    "display_name": "ceph"
+  },
+  {
+    ...
+  }
+]
+===========================================================
+租户		Tenant
+tenant完整数据结构
+
+----------------
+新增 POST /api/tenant
+request body
+{
+  "endpoint": {
+    "address": "127.0.0.1:7480"
+  },
+  "access_key": "I74IB7JXCQN67HUS2XZD",
+  "secret_key": "nwCiFFIJfchFGRARxiDqKoeprWIkX2hKXLX7R1wh"
+}
+
+----------------
+修改 PUT /api/tenant/{username}?endpoint={endpoint_address}
+request body
+{
+  "access_key": "I74IB7JXCQN67HUS2XZD",
+  "secret_key": "nwCiFFIJfchFGRARxiDqKoeprWIkX2hKXLX7R1wh"
+}
+
+----------------
+删除 DELETE /api/tenant/{username}?endpoint={endpoint_address}
+
+----------------
+获取 GET /api/tenant/{username}?endpoint={endpoint_address}
+response body
+{
+  "username": "s3user",
+  "endpoint": {
+    "address": "192.168.1.101:7480",
+    "https": false,
+    "type": 0,
+    "display_name": "ceph"
+  },
+  "access_key": "I74IB7JXCQN67HUS2XZD",
+  "secret_key": "nwCiFFIJfchFGRARxiDqKoeprWIkX2hKXLX7R1wh",
+  "quota": 1099511627776,
+  "display_name": "s3user"
+}
+
+----------------
+列表 GET /api/tenant
+response body
+[
+  {
+    "username": "s3user",
+    "endpoint": {
+      "address": "192.168.1.101:7480",
+      "https": false,
+      "type": 0,
+      "display_name": "ceph"
+    },
+    "access_key": "I74IB7JXCQN67HUS2XZD",
+    "secret_key": "nwCiFFIJfchFGRARxiDqKoeprWIkX2hKXLX7R1wh",
+    "quota": 1099511627776,
+    "display_name": "s3user"
+  },
+  {
+    ...
+  }
+]
+===========================================================
+客户端		Client
+
+----------------
+新增 POST /api/client
+request body
+{
+  "ipv4": 2886769509,
+  "ipv6": null,
+  "hostname": "client1"
+}
+
+----------------
+删除 DELETE /api/client/{ipv4(base64)}
+
+----------------
+列表 GET /api/client
+[
+  {
+    "ipv4": 2886769509,
+    "ipv6": null,
+    "hostname": "client1"
+  },
+  {
+    ...
+  }
+]
+===========================================================
+备份		Backup
+
+----------------
+新增 POST /api/backup
+request body
+{
+  "backup_name": "backup1",
+  "backup_group": 1,
+  "client": {
+    "ipv4": 2886769509
+  },
+  "tenant": {
+    "username": "s3user",
+    "endpoint": {"address": "192.168.1.101:7480"}
+  },
+  "bucket": "bucket-1",
+  "cron_expression": "0/3 * * * * ? ",
+  "start_time": 1589627522,
+  "end_time": null,
+  "hold_time": 0,
+  "hold_type" 0,
+  "backup_data": "{\"include\": [\"a.txt\", \"b.txt\", \"directory\"], \"exclude\": [\"directory/c.txt\"]}" 
+}
+
+----------------
+修改 PUT /api/backup/{uuid}
+{
+  "backup_name": "backup1",
+  "cron_expression": "0/5 * * * * ? ",
+}
+
+----------------
+删除 DELETE /api/backup/{uuid}
+
+----------------
+获取 GET /api/backup/{uuid}
+response body
+{
+  "uuid": "074ccc06-959c-11ea-91ea-e047c3fdab61",
+  "backup_name": "backup1",
+  "backup_group": 1,
+  "client": {
+    "ipv4": 2886769509,
+    "ipv6": null,
+    "hostname": "client1"
+  },
+  {
+    "username": "s3user",
+    "endpoint": {
+      "address": "192.168.1.101:7480",
+      "https": false,
+      "type": 0,
+      "display_name": "ceph"
+    },
+    "access_key": "I74IB7JXCQN67HUS2XZD",
+    "secret_key": "nwCiFFIJfchFGRARxiDqKoeprWIkX2hKXLX7R1wh",
+    "quota": 1099511627776,
+    "display_name": "s3user"
+  },
+  "bucket": "bucket-1",
+  "cron_expression": "0/3 * * * * ? ",
+  "start_time": 1589627522,
+  "end_time": null,
+  "hold_time": 0,
+  "hold_type" 0,
+  "backup_data": "{\"include\": [\"a.txt\", \"b.txt\", \"directory\"], \"exclude\": [\"directory/c.txt\"]}",
+  "state": 0
+}
+
+----------------
+列表 GET /api/backup
+{
+"page": 1,
+"total_page": 10,
+"Data", [
+  {
+      "uuid": "074ccc06-959c-11ea-91ea-e047c3fdab61",
+      "backup_name": "backup1",
+      "backup_group": 1,
+      "client": {
+        "ipv4": 2886769509,
+        "ipv6": null,
+        "hostname": "client1"
+      },
+      {
+        "username": "s3user",
+        "endpoint": {
+          "address": "192.168.1.101:7480",
+          "https": false,
+          "type": 0,
+          "display_name": "ceph"
+        },
+        "access_key": "I74IB7JXCQN67HUS2XZD",
+        "secret_key": "nwCiFFIJfchFGRARxiDqKoeprWIkX2hKXLX7R1wh",
+        "quota": 1099511627776,
+        "display_name": "s3user"
+      },
+      "bucket": "bucket-1",
+      "cron_expression": "0/3 * * * * ? ",
+      "start_time": 1589627522,
+      "end_time": null,
+      "hold_time": 0,
+      "hold_type" 0,
+      "backup_data": "{\"include\": [\"a.txt\", \"b.txt\", \"directory\"], \"exclude\": [\"directory/c.txt\"]}" 
+    },
+    "start_time": 1589627522,
+    "end_time": 1589629081,
+    "hold_time": 1590764400,
+    "state": 0
+  },
+  {
+    ...
+  }
+]
+}
+===========================================================
+备份历史		BackupRecord
+
+----------------
+删除 DELETE /api/record/backup/{id}
+
+----------------
+获取 GET /api/record/backup/{id}
+{
+  "id": 1,
+  "backup_detail": {
+    "uuid": "074ccc06-959c-11ea-91ea-e047c3fdab61",
+    "backup_name": "backup1",
+    "backup_group": 1,
+    "client": {
+      "ipv4": 2886769509,
+      "ipv6": null,
+      "hostname": "client1"
+    },
+    {
+      "username": "s3user",
+      "endpoint": {
+        "address": "192.168.1.101:7480",
+        "https": false,
+        "type": 0,
+        "display_name": "ceph"
+      },
+      "access_key": "I74IB7JXCQN67HUS2XZD",
+      "secret_key": "nwCiFFIJfchFGRARxiDqKoeprWIkX2hKXLX7R1wh",
+      "quota": 1099511627776,
+      "display_name": "s3user"
+    },
+    "bucket": "bucket-1",
+    "cron_expression": "0/3 * * * * ? ",
+    "start_time": 1589627522,
+    "end_time": null,
+    "hold_time": 0,
+    "hold_type" 0,
+    "backup_data": "{\"include\": [\"a.txt\", \"b.txt\", \"directory\"], \"exclude\": [\"directory/c.txt\"]}" 
+  },
+  "start_time": 1589627522,
+  "end_time": 1589629081,
+  "hold_time": 1590764400,
+  "state": 0
+}
+
+----------------
+列表 GET /api/record/backup(?backup={backup_uuid})
+{
+"page": 1,
+"total_page": 10,
+"Data", [
+[
+  {
+    "id": 1,
+    "backup_detail": {
+      "uuid": "074ccc06-959c-11ea-91ea-e047c3fdab61",
+      "backup_name": "backup1",
+      "backup_group": 1,
+      "client": {
+        "ipv4": 2886769509,
+        "ipv6": null,
+        "hostname": "client1"
+      },
+      {
+        "username": "s3user",
+        "endpoint": {
+          "address": "192.168.1.101:7480",
+          "https": false,
+          "type": 0,
+          "display_name": "ceph"
+        },
+        "access_key": "I74IB7JXCQN67HUS2XZD",
+        "secret_key": "nwCiFFIJfchFGRARxiDqKoeprWIkX2hKXLX7R1wh",
+        "quota": 1099511627776,
+        "display_name": "s3user"
+      },
+      "bucket": "bucket-1",
+      "cron_expression": "0/3 * * * * ? ",
+      "start_time": 1589627522,
+      "end_time": null,
+      "hold_time": 0,
+      "hold_type" 0,
+      "backup_data": "{\"include\": [\"a.txt\", \"b.txt\", \"directory\"], \"exclude\": [\"directory/c.txt\"]}" 
+    },
+    "start_time": 1589627522,
+    "end_time": 1589629081,
+    "hold_time": 1590764400,
+    "state": 0
+  },
+  {
+    ...
+  }
+]
+}
+
+
+===========================================================
+恢复		Recovery
+
+----------------
+新增 POST /api/recovery
+{
+  "client": {"ipv4": 2886769509},
+  "backup_record": {"id": 1},
+  "recovery_data": "{\"destination\": \"destination_directory\"}"
+}
+
+
+===========================================================
+恢复历史		RecoveryRecord
+
+----------------
+删除 DELETE /api/record/recovery/{id}
+
+----------------
+获取 GET /api/record/recovery/{id}
+{
+  "id": 1,
+  "client": {
+    "ipv4": 2886769509,
+    "ipv6": null,
+    "hostname": "client1"
+  },
+  "backup_record": {
+    "id": 1,
+    "backup_detail": {
+      "uuid": "074ccc06-959c-11ea-91ea-e047c3fdab61",
+      "backup_name": "backup1",
+      "backup_group": 1,
+      "client": {
+        "ipv4": 2886769509,
+        "ipv6": null,
+        "hostname": "client1"
+      },
+      {
+        "username": "s3user",
+        "endpoint": {
+          "address": "192.168.1.101:7480",
+          "https": false,
+          "type": 0,
+          "display_name": "ceph"
+        },
+        "access_key": "I74IB7JXCQN67HUS2XZD",
+        "secret_key": "nwCiFFIJfchFGRARxiDqKoeprWIkX2hKXLX7R1wh",
+        "quota": 1099511627776,
+        "display_name": "s3user"
+      },
+      "bucket": "bucket-1",
+      "cron_expression": "0/3 * * * * ? ",
+      "start_time": 1589627522,
+      "end_time": null,
+      "hold_time": 0,
+      "hold_type" 0,
+      "backup_data": "{\"include\": [\"a.txt\", \"b.txt\", \"directory\"], \"exclude\": [\"directory/c.txt\"]}" 
+    },
+    "start_time": 1589627522,
+    "end_time": 1589629081,
+    "hold_time": 1590764400,
+    "state": 0
+  },
+  "start_time": 1589627522,
+  "end_time": 1589629081,
+  "hold_time": 1590764400,
+  "recovery_data": "{\"destination\": \"destination_directory\"}"
+}
+
+----------------
+列表 GET /api/record/recovery
+{
+"page": 1,
+"total_page": 10,
+"Data", [
+  {
+    "id": 1,
+    "client": {
+      "ipv4": 2886769509,
+      "ipv6": null,
+      "hostname": "client1"
+    },
+    "backup_record": {
+      "id": 1,
+      "backup_detail": {
+        "uuid": "074ccc06-959c-11ea-91ea-e047c3fdab61",
+        "backup_name": "backup1",
+        "backup_group": 1,
+        "client": {
+          "ipv4": 2886769509,
+          "ipv6": null,
+          "hostname": "client1"
+        },
+        {
+          "username": "s3user",
+          "endpoint": {
+            "address": "192.168.1.101:7480",
+            "https": false,
+            "type": 0,
+            "display_name": "ceph"
+          },
+          "access_key": "I74IB7JXCQN67HUS2XZD",
+          "secret_key": "nwCiFFIJfchFGRARxiDqKoeprWIkX2hKXLX7R1wh",
+          "quota": 1099511627776,
+          "display_name": "s3user"
+        },
+        "bucket": "bucket-1",
+        "cron_expression": "0/3 * * * * ? ",
+        "start_time": 1589627522,
+        "end_time": null,
+        "hold_time": 0,
+        "hold_type" 0,
+        "backup_data": "{\"include\": [\"a.txt\", \"b.txt\", \"directory\"], \"exclude\": [\"directory/c.txt\"]}" 
+      },
+      "start_time": 1589627522,
+      "end_time": 1589629081,
+      "hold_time": 1590764400,
+      "state": 0
+    },
+    "start_time": 1589627522,
+    "end_time": 1589629081,
+    "hold_time": 1590764400,
+    "recovery_data": "{\"destination\": \"destination_directory\"}"
+  },
+  {
+    ...
+  }
+]
+}

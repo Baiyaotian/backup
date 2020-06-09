@@ -1,0 +1,79 @@
+{
+  "id": "1293489",
+  "name": "new",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1686319",
+      "name": "暂停",
+      "font_class": "zanting",
+      "unicode": "e61b",
+      "unicode_decimal": 58907
+    },
+    {
+      "icon_id": "6057678",
+      "name": "trigger",
+      "font_class": "trigger",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "13824512",
+      "name": "play",
+      "font_class": "play",
+      "unicode": "eafc",
+      "unicode_decimal": 60156
+    },
+    {
+      "icon_id": "4025989",
+      "name": "Interrupts",
+      "font_class": "Interrupts",
+      "unicode": "e649",
+      "unicode_decimal": 58953
+    },
+    {
+      "icon_id": "14273395",
+      "name": "分片副本集管理",
+      "font_class": "fenpianfubenjiguanli",
+      "unicode": "e61f",
+      "unicode_decimal": 58911
+    },
+    {
+      "icon_id": "1183013",
+      "name": "详情",
+      "font_class": "xiangqing1",
+      "unicode": "e650",
+      "unicode_decimal": 58960
+    },
+    {
+      "icon_id": "301424",
+      "name": "详情",
+      "font_class": "xiangqing",
+      "unicode": "e626",
+      "unicode_decimal": 58918
+    },
+    {
+      "icon_id": "8319353",
+      "name": "删除",
+      "font_class": "shanchu",
+      "unicode": "e6d0",
+      "unicode_decimal": 59088
+    },
+    {
+      "icon_id": "649313",
+      "name": "左",
+      "font_class": "zuo",
+      "unicode": "e635",
+      "unicode_decimal": 58933
+    },
+    {
+      "icon_id": "649314",
+      "name": "右",
+      "font_class": "you",
+      "unicode": "e636",
+      "unicode_decimal": 58934
+    }
+  ]
+}
