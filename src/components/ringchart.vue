@@ -111,11 +111,7 @@
             .interval()
             .adjust('stack')
             .position('percent')
-            .color('item', (item, color) => {
-              if (item === '剩余空间') {
-                return '#ccc'
-              }
-            })
+            .color('item', [''])
             .tooltip('item*percent*count', (item, percent, count) => {
               // percent = percent * 100 + '%';
               return {

@@ -193,7 +193,9 @@ export default {
       input3: '',
       select: '',
       maxHeight: document.documentElement.clientHeight - 220 ,
-      placeholder: '请选择筛选字段'
+      placeholder: '请选择筛选字段',
+      sort:'', 
+      order:''
     };
   },
   // components: { addSource },
@@ -217,9 +219,9 @@ export default {
     },
     handleCurrentChange(val) {
       this.currentPages = val
-      this.getRecord(this.currentPages, this.select, this.input3)
+      this.getRecord(this.currentPages, this.select, this.input3, this.sort, this.order)
     },
-    getRecord(page, field, value) {
+    getRecord(page, field, value, sort, order) {
       if(field === 'client') {
         value = btoa(value)
       }
@@ -232,7 +234,11 @@ export default {
       } : {
         page
       }
-      record(objData).then(res => {
+      record({
+        ...objData,
+        sort,
+        order
+      }).then(res => {
         this.tableData = res.content.map(item => {
           return {
             ...item.backupDetail,
@@ -262,7 +268,7 @@ export default {
         .then(() => {
           deleteRecord(item.id).then(res => {
             this.$message.success('删除成功')
-            this.getRecord(this.currentPages, this.select, this.input3)
+            this.getRecord(this.currentPages, this.select, this.input3, this.sort, this.order)
           })
         })
         .catch(() => {
@@ -287,7 +293,7 @@ export default {
         },
         )
       }).then(res => {
-        this.getRecord(this.currentPages, this.select, this.input3)
+        this.getRecord(this.currentPages, this.select, this.input3, this.sort, this.order)
         this.recordVisible = false
       })
     },
@@ -308,7 +314,7 @@ export default {
       this.placeholder = `请输入${val === 'backupRecordId' ? '备份历史ID' : val === 'backupName' ? '备份名称' : '备份客户端IP'}`
     },
     searchclick () {
-      this.getRecord(this.currentPages, this.select, this.input3)
+      this.getRecord(this.currentPages, this.select, this.input3,this.sort, this.order)
     },
     tableSortChange ({column, prop, order} ) {
       console.log(column, prop, order);

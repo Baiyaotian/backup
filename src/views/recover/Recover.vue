@@ -252,7 +252,7 @@ export default {
       this.placeholder = `请输入${val === 'backupName' ? '备份名称' : val === 'recovertype' ? '类型' : '恢复客户端IP'}`
     },
     searchclick () {
-      this.getRecord(this.currentPages, this.select, this.input3)
+      this.getRecord(this.currentPages, this.select, this.input3,this.sort, this.order)
     },
     tableSortChange ({column, prop, order} ) {
       console.log(column, prop, order);
