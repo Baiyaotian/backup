@@ -54,7 +54,6 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, form, next) => {
-  console.log(to);
   if (to.name !== 'login' && !Cookies.get('access_token')){
     next({
       name: 'login'
