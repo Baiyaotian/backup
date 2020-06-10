@@ -12,7 +12,7 @@ module.exports = {
                 // target: 'http://10.204.24.178:8762',
                 // target: 'http://10.204.24.105:9762',
                 // target: 'http://10.204.24.129:8080',
-                target: 'http://192.168.0.100:8080/',
+                target: process.env.VUE_APP_API_URL,
                 // target: 'http://10.204.24.106:8080',
                 changeOrigin: true,
                 ws: true,
@@ -26,8 +26,7 @@ module.exports = {
     },
     configureWebpack: config => {
         config.entry.app = ["babel-polyfill", "./src/main.js"];
-     } 
+    } 
     
     
-
 }

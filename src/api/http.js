@@ -6,15 +6,16 @@ import Cookies from 'js-cookie'
 // let loadingServer
 // 超时时间
 axios.defaults.timeout = 10000;
-axios.defaults.baseURL = 'api/'
-// console.log(Vue.prototype.baseUrl);
+if (process.env.NODE_ENV === "development") {
+  axios.defaults.baseURL = 'api/'
+} else if (process.env.NODE_ENV === "production"){
+  axios.defaults.baseURL = CONFIG.baseURL
+}
 // 允许axios携带cookie
 axios.defaults.withCredentials = true
 // http请求拦截器
 axios.interceptors.request.use(
   config => {
-    // console.log(sessionStorage.getItem("token"))
-    // config.headers.access_token = sessionStorage.getItem("token")
     return config
   },
   error => {
@@ -69,6 +70,7 @@ axios.interceptors.response.use(
           break
         case 504:
           error.message = "网关超时"
+          Cookies.remove('access_token')
           router.push({
             name: "login"
           })
