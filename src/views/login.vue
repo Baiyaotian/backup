@@ -177,14 +177,14 @@ export default {
         }
       }
       login(obj).then(res => {
+        sessionStorage.setItem('token', res)
+        sessionStorage.setItem("userinfo", JSON.stringify(obj));
+        Cookies.set('access_token', res)
         this.$router.push({
           name: 'home'
         });
-        sessionStorage.setItem('token', res)
-        Cookies.set('access_token', res)
         this.$message("登录成功");
 
-        sessionStorage.setItem("userinfo", JSON.stringify(obj));
       })
     }
   },

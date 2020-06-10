@@ -36,7 +36,7 @@ function getServerConfig () {
       for (let key in config) {
         Vue.prototype[key] = config[key];
       }
-      axios.defaults.baseURL = Vue.prototype.baseUrl  // 验证是否已经把属性挂在了Vue上
+      // axios.defaults.baseURL = Vue.prototype.baseUrl  // 验证是否已经把属性挂在了Vue上
       resolve();
     }).catch((error) => {
       console.log(error);

@@ -11,6 +11,12 @@
               <el-button type="primary"
                          size="small"
                          @click="addFormVisible = true">新建计划</el-button>
+                <!-- 导出excel -->
+               <el-button 
+                   size="small"
+                   type="primary" 
+                   @click="exportExcel">导出excel表格
+              </el-button>           
               <el-dialog title="创建备份计划"
                          :visible.sync="addFormVisible">
                 <addSource @resflesh-click="resCick"
@@ -39,6 +45,8 @@
                              value="backupName"></el-option>
                   <el-option label="客户端IP"
                              value="client"></el-option>
+                  <el-option label="备份分类"
+                             value="backupGroup"></el-option>           
                 </el-select>
                 <el-button slot="append"
                            icon="el-icon-search"
@@ -61,17 +69,10 @@
                 @sort-change="tableSortChange"
                 @selection-change="handleSelectionChange">
         <el-table-column label="全选"
-                         type="index"
+                         type="selection"
                          align="center"
                          width="60"
                          sortable>
-
-          <template slot-scope="scope">
-            <el-checkbox-group v-model="checkedCities"
-                               @change="handleCheckedCitiesChange">
-              <el-checkbox :label="scope.row.gameId">选中</el-checkbox>
-            </el-checkbox-group>
-          </template>
         </el-table-column>
         <el-table-column prop="backupName"
                          align="center"
@@ -262,7 +263,7 @@ import { BACKUP_STATE, BACKUP_STATE_COLOR, BACKUP_GROUP_TYPE, BACKUP_STATE_ICON 
 import { formatDate } from '@/utils/validate'
 import addSource from "./components/addSource";
 import editSource from './components/editSource';
-
+import { export2Excel } from '@/assets/util'
 export default {
   name: "home",
   data () {
@@ -294,7 +295,8 @@ export default {
       currentPages: 1,
       order: '',
       sort: '',
-      total: 0
+      total: 0,
+      columns: []
     };
   },
   components: { addSource, editSource },
@@ -455,10 +457,29 @@ export default {
     },
     handleSelectionChange (val) {
       this.backTable = val;
+    },
+    handleCheckedCitiesChange () {},
+    exportExcel () {
+      this.columns.splice(0)
+      this.tableData[0]
+      for(let k in this.tableData[0]) {
+        console.log(k);
+        this.columns.push({
+          title: k,
+          key: k
+        })
+      }
+      export2Excel(this.columns, this.tableData)
     }
   },
   mounted () {
     this.getBackup(this.currentPages, this.select, this.input3)
+    // this.columns = this.$refs.backTable.columns.map(item => {
+    //   return {
+    //     title: item.label,
+    //     key: item.property
+    //   }
+    // })
   },
 };
 </script>

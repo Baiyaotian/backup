@@ -6,15 +6,15 @@ import Cookies from 'js-cookie'
 // let loadingServer
 // 超时时间
 axios.defaults.timeout = 10000;
-// axios.defaults.baseURL = 'api/'
+axios.defaults.baseURL = 'api/'
 // console.log(Vue.prototype.baseUrl);
 // 允许axios携带cookie
 axios.defaults.withCredentials = true
 // http请求拦截器
 axios.interceptors.request.use(
   config => {
-    console.log(sessionStorage.getItem("token"))
-    config.headers.access_token = sessionStorage.getItem("token")
+    // console.log(sessionStorage.getItem("token"))
+    // config.headers.access_token = sessionStorage.getItem("token")
     return config
   },
   error => {
