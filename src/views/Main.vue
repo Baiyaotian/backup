@@ -22,7 +22,7 @@
     </el-container> -->
     <el-container>
       <el-header>
-          <div style="color:rgb(255, 255, 255);height:60px; line-height:60px; width:300px;position: absolute;left:0; background-color: rgb(84, 92, 100) ">自动化备份系统 KKBackup</div>
+          <div class="bigtitle" style="color:rgb(255, 255, 255);height:60px; line-height:60px; width:300px;position: absolute;left:0; background-color: rgb(51, 61, 71);font-weight:blod; ">自动化备份系统 KKBackup</div>
          <el-menu
           style="margin-left:300px"
           :router="true"
@@ -156,11 +156,14 @@ body {
   margin: 0;
   padding: 0;
 }
-
+.bigtitle{
+  -webkit-box-shadow: inset 1px 1px 2px rgba(238, 238, 238, 0.2);
+  font: normal 14px/14px Arial, Helvetica, sans-serif;
+  font-size: 18px;
+}
 .el-header,
 .el-footer {
   position: relative;
-  // background-color: #B3C0D1;
   color: #333;
   text-align: center;
   line-height: 60px;
@@ -180,9 +183,6 @@ body {
   text-align: center;
   .topcanvas {
     overflow: hidden;
-    .carousel {
-      height: 300px;
-    }
   }
   .bottom {
     width: 100%;

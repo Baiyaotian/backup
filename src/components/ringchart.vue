@@ -1,6 +1,11 @@
 <template>
     <div class="ringchart">
-        <div :id="'container_' + this.data.username"></div>
+      <div class="title">
+        <div>对象存储用户 {{data.displayName}}</div>
+        <div>@{{data.endpoint}}</div>
+        <div>空间使用情况</div>
+      </div>
+      <div :id="'container_' + this.data.username"></div>
     </div>    
 </template>
 
@@ -41,7 +46,7 @@
               fill: 'skyblue'
             }
           })
-          this.chartData.push({
+          this.chartData.unshift({
             item: '剩余空间',
             count: this.formatByets(surplus),
             percent: Number((parseInt((surplus / quota) * 100 ) / 100).toFixed(10))
@@ -111,11 +116,7 @@
             .interval()
             .adjust('stack')
             .position('percent')
-            .color('item', (item, color) => {
-              if (item === '剩余空间') {
-                return '#ccc'
-              }
-            })
+            .color('item', ['#ccc','#f66','#f90','#3c9','#09f','#66f','#ae0ff2','#168c40','#0367a6','#141259','#325938','#8c4404','#84bfa4','#f2d49b','#d94141','#b28850'])
             .tooltip('item*percent*count', (item, percent, count) => {
               // percent = percent * 100 + '%';
               return {
@@ -137,8 +138,10 @@
 </script>
 
 <style lang="less"  >
-
-    // #container{
-    //   height:100px;
-    // }
+.title{
+ 
+  color: #666;
+  margin-top: 10px;
+  line-height: 22px;
+}
 </style>
