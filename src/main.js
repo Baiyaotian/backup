@@ -10,9 +10,6 @@ import 'element-ui/lib/theme-chalk/index.css';
 import App from './App.vue'
 import axios from 'axios'
 import md5 from 'js-md5';
-import vueResource from 'vue-resource'
-
-Vue.use(vueResource)
 
 const {
   Message

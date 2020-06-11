@@ -104,6 +104,7 @@ export default {
     loginOut () {
       logout().then(res => {
         Cookies.remove('access_token')
+        sessionStorage.removeItem('token')
         this.$router.push({
           name: 'login'
         })
@@ -118,8 +119,9 @@ export default {
     } 
   },
   mounted() {
+    let Api = process.env.NODE_ENV === "development" ? process.env.VUE_APP_API_URL : CONFIG.baseURL
     const EventSource = NativeEventSource || EventSourcePolyfill
-    let es = new EventSource('api/api/event')
+    let es = new EventSource(`${Api}api/event`, { withCredentials: true })
     es.addEventListener('message', (e) => {
       this.$notify({
         title: JSON.parse(e.data).title,

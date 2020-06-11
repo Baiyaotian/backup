@@ -177,8 +177,6 @@ export default {
         }
       }
       login(obj).then(res => {
-        sessionStorage.setItem('token', res)
-        sessionStorage.setItem("userinfo", JSON.stringify(obj));
         Cookies.set('access_token', res)
         this.$router.push({
           name: 'home'
