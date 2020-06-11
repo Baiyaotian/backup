@@ -179,7 +179,7 @@
 					}
 				} else {
 					this.dirData = {
-						script: this.addForm.script
+						scripts: this.addForm.script
 					}
 				}
 				this.$refs.form.validate(valid => {

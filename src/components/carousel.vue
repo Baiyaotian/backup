@@ -1,7 +1,7 @@
 <template>
   <div class="carousel">
-    <el-carousel height="300px" >
-      <el-carousel-item v-for="(item, index) in list" :key="index" :interval="1000000" :autoplay="false" indicator-position="outside">
+    <el-carousel height="365px" >
+      <el-carousel-item v-for="(item, index) in list" :key="index" :interval="100000" :autoplay="false" indicator-position="outside">
         <RingChart :canvasData="item"></RingChart>
       </el-carousel-item>
     </el-carousel>

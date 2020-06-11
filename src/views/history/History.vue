@@ -321,7 +321,7 @@ export default {
       this.sort = prop
       this.order = order === 'ascending' ? 'asc' : order === 'descending' ? 'desc' : ' '
       console.log(this.currentPage, this.select, this.iuput3, this.sort, this.order);
-      this.getBackup(this.currentPage, this.select, this.iuput3, this.sort, this.order)
+      this.getRecord(this.currentPage, this.select, this.iuput3, this.sort, this.order)
     }
   },
   mounted() {
