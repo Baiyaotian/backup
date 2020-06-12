@@ -110,11 +110,13 @@ export default {
 .el-carousel__item {
   background-color: #e9eef3;
   width: 100% !important;
+  height: 100% !important;
+  left: 0 !important;
 }
 .carousel {
   .el-carousel {
     .el-carousel__indicators {
-      buttom: -8px;
+      bottom: -8px;
     }
   }
 }

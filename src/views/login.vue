@@ -177,8 +177,6 @@ export default {
         }
       }
       login(obj).then(res => {
-        sessionStorage.setItem('token', res)
-        sessionStorage.setItem("userinfo", JSON.stringify(obj));
         Cookies.set('access_token', res)
         this.$router.push({
           name: 'home'
@@ -235,7 +233,7 @@ body {
 .mask {
   background-color: rgba(0, 0, 0, 0.1);
   height: 100%;
-  weight: 100%;
+  width: 100%;
 }
 @keyframes move {
   0%,

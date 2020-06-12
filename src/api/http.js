@@ -6,8 +6,10 @@ import Cookies from 'js-cookie'
 // let loadingServer
 // 超时时间
 axios.defaults.timeout = 10000;
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 if (process.env.NODE_ENV === "development") {
-  axios.defaults.baseURL = 'api/'
+  axios.defaults.baseURL = process.env.VUE_APP_API_URL
+  // axios.defaults.baseURL = 'api/'
 } else if (process.env.NODE_ENV === "production"){
   axios.defaults.baseURL = CONFIG.baseURL
 }
@@ -37,8 +39,7 @@ axios.interceptors.response.use(
           break
         case 401:
           error.message = "未授权，请登录";
-          // alert('未授权，请登录');
-          // window.sessionStorage.r`emoveItem('token')
+          // sessionStorage.removeItem('token')
           Cookies.remove('access_token')
           router.push({
             name: 'login'
@@ -91,7 +92,7 @@ export default {
       if (token) {
      
       axios
-          .get(url,{ params:params,headers:{'access_token': token} })
+          .get(url,{ params:params})
           .then(response => {
             resolve(response.data)
           })
@@ -115,14 +116,7 @@ export default {
       axios
         .post(
           url,
-          data,
-          Object.assign(
-            {},
-            {
-              access_token: window.sessionStorage.getItem("token")
-            },
-            headers
-          )
+          data
         )
         .then(
           response => {
@@ -139,9 +133,9 @@ export default {
       axios
         .delete(url,  { params }, {
           headers: {
-            "Content-Type": "application/json",
-            access_token: window.sessionStorage.getItem("token")
-          }
+            "Content-Type": "multipart/form-data"
+          },
+          withCredentials: true
         })
         .then(response => {
           resolve(response.data)
@@ -156,8 +150,7 @@ export default {
       axios
         .patch(url, data, {
           headers: {
-            "Content-Type": "application/json;charset=UTF-8",
-            access_token: window.sessionStorage.getItem("token")
+            "Content-Type": "application/json;charset=UTF-8"
           }
         })
         .then(
@@ -172,9 +165,7 @@ export default {
   },
   put: (url, data) => {
     return new Promise((resolve, reject) => {
-      axios.put(url, data, {
-        access_token: window.sessionStorage.getItem("token")
-      }).then(
+      axios.put(url, data).then(
         response => {
           resolve(response.data)
         },

@@ -146,8 +146,8 @@
 					startTime: '',
 					endTime: '',
 					cronExpression: '0 0/5 * * * ? * ' ,//表达式
-					holdTimeType: '0', 
-					holdTime: '999999999999',
+					holdTimeType: '2', 
+					holdTime: '5',
 					mountPoint: '/buckup'
 				},
 				addFormRules: {
