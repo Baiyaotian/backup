@@ -233,7 +233,7 @@ body {
 .mask {
   background-color: rgba(0, 0, 0, 0.1);
   height: 100%;
-  weight: 100%;
+  width: 100%;
 }
 @keyframes move {
   0%,

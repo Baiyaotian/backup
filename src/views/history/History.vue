@@ -185,8 +185,8 @@ export default {
       recordForm: {
         backupRecordId: '',
         client: '',
-        destingationOrScript: '',
-        mountPoint: ''
+        destingationOrScript: '/root/test',
+        mountPoint: '/mnt/s3fs'
       },
       clientList: [],
       backupGroup: 1,

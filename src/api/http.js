@@ -6,6 +6,7 @@ import Cookies from 'js-cookie'
 // let loadingServer
 // 超时时间
 axios.defaults.timeout = 10000;
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 if (process.env.NODE_ENV === "development") {
   axios.defaults.baseURL = process.env.VUE_APP_API_URL
   // axios.defaults.baseURL = 'api/'
@@ -115,11 +116,7 @@ export default {
       axios
         .post(
           url,
-          data,
-          Object.assign(
-            {},
-            headers
-          )
+          data
         )
         .then(
           response => {
@@ -136,8 +133,9 @@ export default {
       axios
         .delete(url,  { params }, {
           headers: {
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "multipart/form-data"
+          },
+          withCredentials: true
         })
         .then(response => {
           resolve(response.data)
