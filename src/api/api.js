@@ -1,6 +1,6 @@
 import http  from './http.js'
 const { post, get, patch, put} = http
-export const login = params => get('login', params)
+export const login = params => get('api/login', params)
 export const logout = () => get('api/logout')
 export const usage = () => get('api/usage')
 export const endPoint = () => get(`api/endpoint`)
