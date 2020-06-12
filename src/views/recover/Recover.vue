@@ -71,11 +71,13 @@
 									size="small"
 									type="danger"
 									icon="el-icon-delete"
+                  :disabled="scope.row.state === '等待中' || scope.row.state === '运行中'"
 								></el-button>
 							</el-tooltip>
 							<el-tooltip class="item" effect="dark" content="中断" placement="top-start">
 								<el-button
 									@click="interRecovery(scope.row)"
+                  :disabled="scope.row.state !== '等待中' && scope.row.state !== '运行中'"
 									size="small"
 									icon="iconfont icon-Interrupts"
 									class="tiggerbtn"
@@ -272,17 +274,28 @@
 				);
 			},
 			interRecovery(item) {
-				interruptRecovery(item.id, {
-					option: "interrupt"
-				}).then(res => {
-					this.getRecoery(
-						this.currentPages,
-						this.select,
-						this.input3,
-						this.sort,
-						this.order
-					);
-				});
+        this.$confirm(
+					`此操作将中断ID为${item.id}的恢复任务, 是否继续?`,
+					"提示",
+					{ type: "warning" }
+				)
+					.then(() => {
+						interruptRecovery(item.id, {
+              option: "interrupt"
+            }).then(res => {
+              this.getRecoery(
+                this.currentPages,
+                this.select,
+                this.input3,
+                this.sort,
+                this.order
+              );
+            });
+					})
+					.catch(() => {
+						this.$message.info("已取消操作!");
+					});
+				
 			},
 			tableRowClick(row) {
 				console.log(row);
@@ -381,6 +394,10 @@
 	background-color: rgb(255, 201, 0);
 	border: none;
 	color: #fff;
+}
+.tiggerbtn.is-disabled {
+  color: #fff;
+  background-color: rgba(255, 201, 0, .4)
 }
 .el-row {
 	font-size: 12px;

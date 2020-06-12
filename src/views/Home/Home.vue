@@ -313,59 +313,82 @@
 				);
 			},
 			runOrStop(item) {
-				let option = "";
+				let option = ""; 
 				if (item.cronTriggerList[0].state === 0x02) {
 					option = "resume";
 				} else {
 					option = "pause";
 				}
-				resumeBackup(item.uuid, {
-					option: option
-				}).then(res => {
-					this.getBackup(
-						this.currentPages,
-						this.select,
-						this.input3,
-						this.sort,
-						this.order
-					);
-				});
+				this.$confirm(
+					`此操作将${option === "resume" ?  '运行' : ''}${item.backupName}的备份计划, 是否继续?`,
+					"提示",
+					{ type: "warning" }
+				)
+					.then(() => {
+						resumeBackup(item.uuid, {
+							option: option
+						}).then(res => {
+							this.$message.success("成功");
+							this.getBackup(
+								this.currentPages,
+								this.select,
+								this.input3,
+								this.sort,
+								this.order
+							);
+						});
+					})
+					.catch(() => {
+						this.$message.info("已取消操作!");
+					});
 			},
 			tiggerBackup(item) {
-				resumeBackup(item.uuid, {
-					option: "trigger"
-				}).then(res => {
-					this.getBackup(
-						this.currentPages,
-						this.select,
-						this.input3,
-						this.sort,
-						this.order
-					);
-				});
+				this.$confirm(
+					"此操作将触发 " + item.backupName + " 的备份计划, 是否继续?",
+					"提示",
+					{ type: "warning" }
+				)
+					.then(() => {
+						resumeBackup(item.uuid, {
+							option: "trigger"
+						}).then(res => {
+							this.$message.success("成功");
+							this.getBackup(
+								this.currentPages,
+								this.select,
+								this.input3,
+								this.sort,
+								this.order
+							);
+						});
+					})
+					.catch(() => {
+						this.$message.info("已取消操作!");
+					});
 			},
 			interruptBackup(item) {
-				resumeBackup(item.uuid, {
-					option: "interrupt"
-				}).then(res => {
-					this.getBackup(
-						this.currentPages,
-						this.select,
-						this.input3,
-						this.sort,
-						this.order
-					);
-				});
-			},
-			submitForm(formName) {
-				this.$refs[formName].validate(valid => {
-					if (valid) {
-						alert("submit!");
-					} else {
-						console.log("error submit!!");
-						return false;
-					}
-				});
+				this.$confirm(
+					"此操作将中断 " + item.backupName + " 的备份计划, 是否继续?",
+					"提示",
+					{ type: "warning" }
+				)
+					.then(() => {
+						resumeBackup(item.uuid, {
+							option: "interrupt"
+						}).then(res => {
+							this.$message.success("成功");
+							this.getBackup(
+								this.currentPages,
+								this.select,
+								this.input3,
+								this.sort,
+								this.order
+							);
+						});
+					})
+					.catch(() => {
+						this.$message.info("已取消操作!");
+					});
 			},
 			resetForm(formName) {
 				this.$refs[formName].resetFields();
@@ -382,8 +405,9 @@
 				}
 			},
 			removeUser(item) {
+				console.log(item)
 				this.$confirm(
-					"此操作将永久删除uuid为 " + item.uuid + " 的备份计划, 是否继续?",
+					"此操作将永久删除uuid为 " + item.backupName + " 的备份计划, 是否继续?",
 					"提示",
 					{ type: "warning" }
 				)
