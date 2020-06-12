@@ -3,6 +3,7 @@ import router from "../router"
 import Vue from 'vue'
 import {Message, Loading } from 'element-ui'
 import Cookies from 'js-cookie'
+import qs from 'qs'
 // let loadingServer
 // 超时时间
 axios.defaults.timeout = 10000;
@@ -132,9 +133,6 @@ export default {
     return new Promise((resolve, reject) => {
       axios
         .delete(url,  { params }, {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          },
           withCredentials: true
         })
         .then(response => {
@@ -148,9 +146,9 @@ export default {
   patch: (url, data) => {
     return new Promise((resolve, reject) => {
       axios
-        .patch(url, data, {
+        .patch(url, qs.stringify(data), {
           headers: {
-            "Content-Type": "application/json;charset=UTF-8"
+            "Content-Type": "text/plain"
           }
         })
         .then(

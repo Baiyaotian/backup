@@ -318,43 +318,76 @@
 				} else {
 					option = "pause";
 				}
-				resumeBackup(item.uuid, {
-					option: option
-				}).then(res => {
-					this.getBackup(
-						this.currentPages,
-						this.select,
-						this.input3,
-						this.sort,
-						this.order
-					);
-				});
+				this.$confirm(
+					"此操作将 " + item.uuid + " 的备份计划, 是否继续?",
+					"提示",
+					{ type: "warning" }
+				)
+					.then(() => {
+						deleteBackup(item.uuid, {
+							option: option
+						}).then(res => {
+							this.$message.success("成功");
+							this.getBackup(
+								this.currentPages,
+								this.select,
+								this.input3,
+								this.sort,
+								this.order
+							);
+						});
+					})
+					.catch(() => {
+						this.$message.info("已取消操作!");
+					});
 			},
 			tiggerBackup(item) {
-				resumeBackup(item.uuid, {
-					option: "trigger"
-				}).then(res => {
-					this.getBackup(
-						this.currentPages,
-						this.select,
-						this.input3,
-						this.sort,
-						this.order
-					);
-				});
+				this.$confirm(
+					"此操作将 " + item.uuid + " 的备份计划, 是否继续?",
+					"提示",
+					{ type: "warning" }
+				)
+					.then(() => {
+						resumeBackup(item.uuid, {
+							option: "trigger"
+						}).then(res => {
+							this.$message.success("成功");
+							this.getBackup(
+								this.currentPages,
+								this.select,
+								this.input3,
+								this.sort,
+								this.order
+							);
+						});
+					})
+					.catch(() => {
+						this.$message.info("已取消操作!");
+					});
 			},
 			interruptBackup(item) {
-				resumeBackup(item.uuid, {
-					option: "interrupt"
-				}).then(res => {
-					this.getBackup(
-						this.currentPages,
-						this.select,
-						this.input3,
-						this.sort,
-						this.order
-					);
-				});
+				this.$confirm(
+					"此操作将 " + item.uuid + " 的备份计划, 是否继续?",
+					"提示",
+					{ type: "warning" }
+				)
+					.then(() => {
+						resumeBackup(item.uuid, {
+							option: "interrupt"
+						}).then(res => {
+							this.$message.success("成功");
+							this.getBackup(
+								this.currentPages,
+								this.select,
+								this.input3,
+								this.sort,
+								this.order
+							);
+						});
+					})
+					.catch(() => {
+						this.$message.info("已取消操作!");
+					});
 			},
 			submitForm(formName) {
 				this.$refs[formName].validate(valid => {

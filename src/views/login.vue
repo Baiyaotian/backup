@@ -70,6 +70,7 @@
               <el-button type="primary"
                          size="medium"
                          class="submit-btn"
+                         @keyup.enter="submitForm('loginForm')"
                          @click="submitForm('loginForm')">登录</el-button>
             </el-form-item>
           </el-form>
