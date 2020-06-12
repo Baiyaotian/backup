@@ -105,14 +105,11 @@
 			}
 		},
 		mounted() {
-			console.log(this.$route);
-			let Api =
-				process.env.NODE_ENV === "development"
-					? process.env.VUE_APP_API_URL
-					: CONFIG.baseURL;
+			let Api =	process.env.NODE_ENV === "development"	? '/'	: CONFIG.baseURL;
 			const EventSource = NativeEventSource || EventSourcePolyfill;
 			let es = new EventSource(`${Api}api/event`, { withCredentials: true });
 			es.addEventListener("message", e => {
+				console.log(e)
 				this.$notify({
 					title: JSON.parse(e.data).title,
 					message: JSON.parse(e.data).message,

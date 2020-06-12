@@ -3,21 +3,22 @@ import router from "../router"
 import Vue from 'vue'
 import {Message, Loading } from 'element-ui'
 import Cookies from 'js-cookie'
-// let loadingServer
+let loadingServer
 // 超时时间
 axios.defaults.timeout = 10000;
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 if (process.env.NODE_ENV === "development") {
-  axios.defaults.baseURL = process.env.VUE_APP_API_URL
+  axios.defaults.baseURL = '/'
   // axios.defaults.baseURL = 'api/'
 } else if (process.env.NODE_ENV === "production"){
-  axios.defaults.baseURL = CONFIG.baseURL
+  axios.defaults.baseURL = '/'
 }
 // 允许axios携带cookie
 axios.defaults.withCredentials = true
 // http请求拦截器
 axios.interceptors.request.use(
   config => {
+    loadingServer = Loading.service()
     return config
   },
   error => {
@@ -27,11 +28,11 @@ axios.interceptors.request.use(
 // http响应拦截器
 axios.interceptors.response.use(
   response => {
-    // loadingServer.close()
+    loadingServer.close()
     return response
   },
   error => {
-    // loadingServer.close()
+    loadingServer.close()
     if (error && error.response) {
       switch (error.response.status) {
         case 400:

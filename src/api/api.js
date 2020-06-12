@@ -14,6 +14,7 @@ export const deletePonit = (address) => http.delete(`api/endpoint/${address}`)
 export const addClient = (params) => post('api/client', params)
 // 备份计划
 export const backup = (params) => get(`api/backup`, params)
+export const backups = () => get(`api/backups`)
 // 删除备份计划
 export const deleteBackup = (id) => http.delete(`api/backup/${id}`)
 // 恢复运行备份计划

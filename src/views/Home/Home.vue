@@ -46,10 +46,9 @@
 				ref="backTable"
 				@row-click="tableRowClick"
 				@sort-change="tableSortChange"
-				@selection-change="handleSelectionChange"
         @filter-change="tableFilter"
 			>
-				<el-table-column label="全选" type="selection" align="center" width="60" sortable></el-table-column>
+				<!-- <el-table-column label="全选" type="selection" align="center" width="60" sortable></el-table-column> -->
 				<el-table-column
 					prop="backupName"
 					align="center"
@@ -58,7 +57,7 @@
 					label="备份任务名"
 				></el-table-column>
 				<el-table-column
-					prop="ip"
+					prop="client"
 					show-overflow-tooltip
 					align="center"
 					min-width="120px"
@@ -74,7 +73,6 @@
           column-key="backupGroup"
 					:filters="backupFilters"
           :filter-multiple="false"
-          :filter-method="backupFilterMethod"
 				></el-table-column>
 				<el-table-column prop="cronExpression" align="center" min-width="90" label="cron表达式"></el-table-column>
 				<el-table-column prop="state" align="center" min-width="108" label="状态">
@@ -154,7 +152,7 @@
 								<el-col :span="12">客户端信息</el-col>
 							</el-row>
 							<el-row>
-								<el-col :span="12">备份客户端IP: {{scope.row.ip}}</el-col>
+								<el-col :span="12">备份客户端IP: {{scope.row.client}}</el-col>
 								<el-col :span="12">用户名: {{scope.row.client.username}}</el-col>
 							</el-row>
 							<el-row>
@@ -210,8 +208,10 @@
 				<el-pagination
 					:current-page="currentPages"
 					@current-change="handleCurrentChange"
+					@size-change="hanldleSizeChange"
 					:page-size="10"
-					layout="prev, pager, next, jumper"
+					:page-sizes="[10, 20, 50]"
+					layout="sizes, prev, pager, next, jumper"
 					:total="total"
 				></el-pagination>
 			</div>
@@ -220,7 +220,7 @@
 </template>
 
 <script>
-	import { backup, deleteBackup, resumeBackup } from "@/api/api";
+	import { backup, deleteBackup, resumeBackup, backups } from "@/api/api";
 	import {
 		BACKUP_STATE,
 		BACKUP_STATE_COLOR,
@@ -259,11 +259,13 @@
 				maxHeight: document.documentElement.clientHeight - 270,
 				placeholder: "请选择筛选字段",
 				currentPages: 1,
+				total: 0,
+				size: 10,
 				order: "",
 				sort: "",
-				total: 0,
 				columns: [],
-				backupFilters: []
+				backupFilters: [],
+				flag: false
 			};
 		},
 		components: { addSource, editSource },
@@ -272,7 +274,7 @@
 				if (field === "client") {
 					value = btoa(value);
 				}
-				let objData = field && value ? { page: page, [field]: value } : { page };
+				let objData = field && value ? { page: page, [field]: value, size: this.size } : { page, size: this.size };
 				backup({
 					...objData,
 					sort,
@@ -282,14 +284,13 @@
 						return {
 							...item,
 							...item.client,
-							ip: this.intToip(item.client.ipv4),
+							client: this.intToip(item.client.ipv4),
 							state: BACKUP_STATE[item.cronTriggerList[0].state],
 							color: BACKUP_STATE_COLOR[item.cronTriggerList[0].state],
 							backupGroup: BACKUP_GROUP_TYPE[item.backupGroup],
 							icon: BACKUP_STATE_ICON[item.cronTriggerList[0].state],
 							endTime: formatDate(item.endTime),
 							startTime: formatDate(item.startTime)
-							// holdTimeType: item.holdTimeType,
 						};
 					});
 					this.total = res.totalElements;
@@ -460,30 +461,32 @@
 				this.currentPages = val;
 				this.getBackup(this.currentPages, this.select, this.input3);
 			},
-			handleSelectionChange(val) {
-				this.backTable = val;
-			},
 			handleCheckedCitiesChange() {},
 			exportExcel() {
 				this.columns.splice(0);
-				this.tableData[0];
-				for (let k in this.tableData[0]) {
-					console.log(k);
-					this.columns.push({
-						title: k,
-						key: k
-					});
-				}
-				export2Excel(this.columns, this.tableData);
-      },
-      backupFilterMethod (value, row, column) {
-        return row.backupGroup === BACKUP_GROUP_TYPE[value]
+				backups().then(res => {
+					for (let k in res[0]) {
+						this.columns.push({
+							title: k,
+							key: k
+						});
+					}
+				export2Excel(this.columns, res);
+				})
       },
       tableFilter (filters) {
-        console.log(Object.values(filters).flat(), Object.keys(filters))
-        this.getBackup(this.currentPages,	Object.keys(filters)[0],	Object.values(filters).flat()[0],	this.sort,	this.order);
-        // let [this.select, this.input3] = Array.from(filters)
-      }
+        this.getBackup(this.currentPages,	'type',	Object.values(filters).flat()[0],	this.sort,	this.order);
+			},
+			hanldleSizeChange (sizes) {
+				this.size = sizes
+				this.getBackup(
+					this.currentPages,
+					this.select,
+					this.input3,
+					this.sort,
+					this.order
+				);
+			}
 		},
 		mounted() {
 			for (let k in BACKUP_GROUP_TYPE) {

@@ -1,5 +1,7 @@
 const TerserPlugin = require('terser-webpack-plugin')
 module.exports = {
+	assetsDir: 'static',
+	indexPath: 'templates/index.html',
 	devServer: {
 		port: 3333,
 		host: '0.0.0.0',
@@ -11,7 +13,7 @@ module.exports = {
 				changeOrigin: true,
 				ws: true,
 				pathRewrite: {
-					'^/api': ''
+					'^/api': '/api'
 				}
 			}
 		}, // 配置多个代理
