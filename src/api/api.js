@@ -11,7 +11,9 @@ export const addTenant = (params) => post(`api/tenant`, params)
 export const client = () => get(`api/client`)
 export const deleteClient = (ip) => http.delete(`api/client/${ip}`)
 export const deletePonit = (address) => http.delete(`api/endpoint/${address}`)
-export const addClient = (params) => post('api/client', params)
+export const addClient = (params) => post('api/client', params, {
+  timeout: 300000
+})
 // 备份计划
 export const backup = (params) => get(`api/backup`, params)
 export const backups = () => get(`api/backups`)

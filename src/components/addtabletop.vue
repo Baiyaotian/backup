@@ -32,9 +32,6 @@
 <script>
 import { validateIP, ipToint, isMB } from "../utils/validate"
 import { addClient } from '@/api/api'
-// console.log(validateIP);
-// import { resource, } from ''
-// import addSource from './components/addSource'
 export default {
   props: ["is_category", "value"],
   data() {
@@ -73,7 +70,7 @@ export default {
             ipv4: ipToint(this.form.ipv4)
           }).then(res => {
             console.log(res);
-            this.$emit("resflesh-click", true);
+            this.$emit("resflesh-client", true);
             this.$emit("input", false);
           }).
           catch(err => {

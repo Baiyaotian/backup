@@ -6,50 +6,37 @@
 				<div slot="header" class="clearfix noborder">
 					<h2 style="font-size:20px">web登录页面</h2>
 				</div>
-				<!-- 注册表单 -->
-				<div class="register" v-show=" nowStatus === 'register' ">
-					<el-form ref="registerForm" :model="registerForm" :rules="registerRules" label-width="0px" >
-						<el-form-item class="no-label" prop="name">
-							<el-input v-model="registerForm.name" placeholder="请输入用户名" prefix-icon="iconfont icon-user"></el-input>
-						</el-form-item>
-						<el-form-item class="no-label" prop="email">
-							<el-input v-model="registerForm.email" placeholder="请输入邮箱"></el-input>
-						</el-form-item>
-						<el-form-item class="no-label" prop="password">
-							<el-input v-model="registerForm.password" placeholder="请输入密码" type="password"></el-input>
-						</el-form-item>
-						<el-form-item class="no-label" prop="passwordEnsure">
-							<el-input v-model="registerForm.passwordEnsure" placeholder="请再次输入密码" type="password"></el-input>
-						</el-form-item>
-						<el-form-item prop="submit">
-							<el-button type="primary" class="submit-btn" @click="submit('registerForm')"></el-button>
-						</el-form-item>
-					</el-form>
-				</div>
 				<!-- 登录表单 -->
-				<div class="login" v-show=" nowStatus === 'login' ">
-					<el-form ref="loginForm" :model="loginForm" :rules="loginRules" label-width="0px" @keyup.native.enter="submitForm('loginForm')" v-focus>
-						<el-form-item class="no-label" prop="userame">
-							<el-input v-model="loginForm.username" placeholder="请输入手机号或邮箱"></el-input>
+				<div class="login">
+					<el-form
+						ref="loginForm"
+						:model="loginForm"
+						:rules="loginRules"
+						label-width="0px"
+						@keyup.native.enter="submitForm('loginForm')"
+						v-focus
+					>
+						<el-form-item class="no-label" prop="username">
+							<input v-model="loginForm.username" placeholder="请输入手机号或邮箱" autofocus v-focus class="input-class" />
 						</el-form-item>
 						<el-form-item class="no-label" prop="password">
 							<el-input v-model="loginForm.password" placeholder="请输入密码" type="password"></el-input>
 						</el-form-item>
-						<el-form-item prop="submit">
+						<el-form-item>
 							<el-button
 								type="primary"
 								size="medium"
 								class="submit-btn"
 								@click="submitForm('loginForm')"
-                >登录</el-button>
+							>登录</el-button>
 						</el-form-item>
 					</el-form>
-					<div class="switcher">
+					<!-- <div class="switcher">
 						{{ tips[nowStatus].base }}
 						<span
 							@click="nowStatus = nowStatus === 'register'?'login':'register'"
 						>{{ tips[nowStatus].link}}</span>
-					</div>
+					</div>-->
 				</div>
 			</el-card>
 		</div>
@@ -83,76 +70,48 @@
 				}
 			};
 			return {
-				nowStatus: "login",
-				tips: {
-					register: {
-						base: "已有账户",
-						link: "登录"
-					},
-					login: {
-						base: "没有账号",
-						link: "注册"
-					}
-				},
-				registerForm: {
-					email: "",
-					password: "",
-					passwordEnsure: ""
-				},
-				registerRules: {
-					email: [
-						{ required: true, message: "请输入邮箱", trigger: "blur" },
-						{
-							type: "email",
-							message: "请输入正确的邮箱地址",
-							trigger: ["blur", "change"]
-						}
-					],
-					password: [
-						{ required: true, message: "请输入密码", trigger: "blur" },
-						{ vaildator: validatePass, trigger: "blur" }
-					],
-					passwordEnsure: [
-						{ required: true, message: "请输入密码", trigger: "blur" },
-						{ vaildator: validatePass, trigger: "blur" }
-					]
-				},
 				loginForm: {
 					username: "",
 					password: ""
 				},
 				loginRules: {
-					username: [
-						{ required: true, message: "请输入用户名或邮箱", trigger: "blur" }
-					],
+					username: [{ required: true, message: "请输入用户名或邮箱", trigger: "blur" }],
 					password: [{ required: true, message: "请输入密码", trigger: "blur" }]
 				}
 			};
 		},
 		methods: {
 			submitForm(formName) {
-				let obj = {
-					username: this.loginForm.username,
-					password: this.$md5(this.loginForm.password)
-				};
-				login(obj).then(res => {
-					Cookies.set("access_token", res);
-					this.$router.push({
-						name: "home"
-					});
-					this.$message("登录成功");
+				this.$refs.loginForm.validate(valid => {
+					if (valid) {
+						let obj = {
+							username: this.loginForm.username,
+							password: this.$md5(this.loginForm.password)
+						};
+						login(obj).then(res => {
+							if (Cookies.get("access_token")) {
+								Cookies.remove("access_token");
+							} else {
+								Cookies.set("access_token", res);
+							}
+							this.$router.push({
+								name: "home"
+							});
+							this.$message("登录成功");
+						});
+					}
 				});
 			}
 		},
-    mounted() {},
-    directives: {
-      focus: {
-        // 指令的定义
-        inserted: function (el) {
-          el.focus()
-        }
-      }
-    },
+		mounted() {},
+		directives: {
+			focus: {
+				// 指令的定义
+				inserted: function(el) {
+					el.focus();
+				}
+			}
+		}
 	};
 </script>
 
@@ -182,6 +141,9 @@ body {
 	font-size: 100px;
 	color: #fff;
 	animation: move 10s infinite;
+	.noborder {
+		text-align: center;
+	}
 }
 .main {
 	width: 500px;
@@ -253,5 +215,39 @@ body {
 	font-size: 14px;
 	color: rgba(84, 92, 100, 0.6);
 	font-weight: 600;
+}
+.input-class {
+	-webkit-appearance: none;
+    background-color: #FFF;
+    background-image: none;
+    border-radius: 4px;
+    border: 1px solid #DCDFE6;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    font-size: inherit;
+    height: 32px;
+    line-height: 32px;
+    outline: 0;
+    padding: 0 13px;
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    width: 100%;
+}
+
+.input-class::-webkit-input-placeholder { /* WebKit browsers */ 
+    color: #c1c5cd;
+		font-size: 13px;
+} 
+.input-class:-moz-placeholder { /* Mozilla Firefox 4 to 18 */ 
+    color: #c1c5cd;
+		font-size: 13px;
+} 
+.input-class::-moz-placeholder { /* Mozilla Firefox 19+ */ 
+    color: #c1c5cd;
+		font-size: 13px; 
+} 
+.input-class:-ms-input-placeholder { /* Internet Explorer 10+ */ 
+    color: #c1c5cd;
+		font-size: 13px; 
 }
 </style>

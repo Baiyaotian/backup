@@ -35,7 +35,7 @@
 				@filter-change="tableFilter"
 			>
 				<!-- <el-table-column label="序号" type="index" align="center" width="60px"></el-table-column> -->
-				<el-table-column label="Id" prop="id" align="center" min-width="60px" sortable="custom"></el-table-column>
+				<el-table-column label="Id" prop="id" align="center" width="60px" sortable="custom" fixed="left"></el-table-column>
 				<el-table-column
 					prop="backupName"
 					align="center"
@@ -62,14 +62,19 @@
 					</template>
 				</el-table-column>
 				<el-table-column prop="bucket" align="center" min-width="80px" label="桶"></el-table-column>
-				<el-table-column prop="startTime" align="center" min-width="133px" label="开始时间"></el-table-column>
-				<el-table-column prop="endTime" align="center" min-width="133px" label="结束时间"></el-table-column>
+				<el-table-column prop="startTime" align="center" min-width="140px" label="开始时间"></el-table-column>
+				<el-table-column prop="endTime" align="center" min-width="140px" label="结束时间"></el-table-column>
+				<el-table-column prop="holdTime" align="center" min-width="140px" label="保留时间">
+					<template slot-scope="scope">
+						<span :style="{color: (new Date(scope.row.holdTime) - new Date()) <= 259200000 &&  (new Date(scope.row.holdTime) - new Date()) >= 0 ? '#f40' : ''}">{{scope.row.holdTime}}</span>
+					</template>
+				</el-table-column>
 				<el-table-column prop="state" align="center" min-width="80" label="完成状态">
 					<template slot-scope="scope">
 						<el-tag size="small" :type="scope.row.color" effect="dark">{{scope.row.state}}</el-tag>
 					</template>
 				</el-table-column>
-				<el-table-column prop="prop" align="center" width="120px" label="操作">
+				<el-table-column prop="prop" align="center" width="110px" label="操作" fixed="right">
 					<template slot-scope="scope">
 						<div class="btn-size">
 							<el-tooltip class="item" effect="dark" content="删除" placement="top-start">
@@ -94,15 +99,16 @@
 						</div>
 					</template>
 				</el-table-column>
-				<el-table-column type="expand" width="1" v-show="false">
+				<el-table-column type="expand" width="1">
 					<template slot-scope="scope">
 						<div class="this-backgroundcol" :span="24">
 							<el-row>
 								<el-col :span="12">id: {{scope.row.id}}</el-col>
-								<el-col :span="12">uuid: {{scope.row.backupName}}</el-col>
+								<el-col :span="12">uuid: {{scope.row.uuid}}</el-col>
 							</el-row>
 							<el-row>
-								<el-col :span="12">备份类型: {{scope.row.backupGroup=== 1 ? '恢复目标路径:' : '恢复脚本:'}}</el-col>
+								<el-col :span="12">备份名称: {{scope.row.backupName}}</el-col>
+								<el-col :span="12">备份类型: {{scope.row.recovertype}}</el-col>
 							</el-row>
 						</div>
 						<div class="other-backgroundcol" :span="24">
@@ -167,7 +173,7 @@
 				</el-form-item>
 				<el-form-item label="恢复客户端:" prop="client">
 					<el-select v-model="recordForm.client">
-						<el-option :label="item" :value="item" v-for="(item, index) in clientList" :key="index"></el-option>
+						<el-option :label="item.ip" :value="item.ip" v-for="(item, index) in clientList" :key="index"></el-option>
 					</el-select>
 				</el-form-item>
 				<el-form-item :label="backupGroup === 1 ? '恢复目标路径:' : '恢复脚本:'" prop="destingationOrScript">
@@ -192,7 +198,7 @@
 		RECORD_STATE_COLOR
 	} from "@/utils/type";
 	import { intToip, ipToint, formatDate } from "@/utils/validate";
-	// import addSource from "./components/addSource";
+	import { mapState } from 'vuex';
 	export default {
 		data() {
 			return {
@@ -209,7 +215,6 @@
 					destingationOrScript: "/root/test",
 					mountPoint: "/mnt/s3fs"
 				},
-				clientList: [],
 				backupGroup: 1,
 				input3: "",
 				select: "",
@@ -220,7 +225,6 @@
         backupFilters: []
 			};
 		},
-		// components: { addSource },
 		methods: {
 			handleCurrentChange(val) {
 				this.currentPages = val;
@@ -265,7 +269,8 @@
 							state: RECORD_STATE[item.state],
 							color: RECORD_STATE_COLOR[item.state],
 							endTime: formatDate(item.endTime),
-							startTime: formatDate(item.startTime)
+							startTime: formatDate(item.startTime),
+							holdTime: formatDate(item.holdTime)
 							//errorMessage: item.errorMessage === null ? null : item.errorMessage.replace(/\n/g,'<br></br>')
 						};
 					});
@@ -322,10 +327,16 @@
 				});
 			},
 			tableRowClick(row) {
-				this.tableData.forEach(item => {
-					if (typeof item.backupData === "string") {
-						item.backupData = JSON.parse(item.backupData);
+				if (row.backupData && row.backupData !== '""') {
+					if (typeof row.backupData === "string") {
+						row.backupData = JSON.parse(row.backupData);
+						if (row.backupGroup === '文件') {
+							row.backupData.exclude = row.backupData.exclude.join(", ");
+							row.backupData.include = row.backupData.include.join(", ");
+						}
 					}
+				}
+				this.tableData.forEach(item => {
 					if (item.id !== row.id) {
 						this.$refs.HistoryTable.toggleRowExpansion(item, false);
 					}
@@ -385,15 +396,20 @@
 		},
 		mounted() {
 			this.getRecord(this.currentPages, this.select, this.input3);
-			client().then(res => {
-				this.clientList = res.map(item => intToip(item.ipv4));
-      });
+			// client().then(res => {
+			// 	this.clientList = res.map(item => intToip(item.ipv4));
+      // });
       for (let k in BACKUP_GROUP_TYPE) {
 				this.backupFilters.push({
 					text: BACKUP_GROUP_TYPE[k],
 					value: k
 				});
 			}
+		},
+		computed: {
+			...mapState({
+				clientList: 'clientList'
+			})
 		}
 	};
 </script>
@@ -430,5 +446,11 @@
 }
 .this-backgroundcol {
 	padding: 10px 10px;
+}
+.block {
+	margin-top: 10px;
+}
+.el-table {
+	// display: table-cell !important;
 }
 </style>

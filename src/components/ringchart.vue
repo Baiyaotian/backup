@@ -33,26 +33,22 @@
           // 总容量
           let quota = this.data.quota * 1024 * 1024 * 1024
           // 桶使用总量
-          let num = this.data.usages.CapacityUsed[0].Buckets.reduce((cur, next) => {
-            return cur += next.Bytes_Rounded
-          }, 0)
+          let num = this.data.usages.Summary[1]
           // 未使用你内存
           let surplus = quota - num
           this.chartData = this.data.usages.CapacityUsed[0].Buckets.map(item => {
             return {
               item: item.Bucket,
               count: this.formatByets(item.Bytes_Rounded),
-              percent: Number((parseInt((item.Bytes_Rounded / quota) * 100) / 100).toFixed(10)),
-              fill: 'skyblue'
+              percent: Number(((item.Bytes_Rounded / quota)).toFixed(10))
             }
           })
           this.chartData.unshift({
             item: '剩余空间',
             count: this.formatByets(surplus),
-            percent: Number((parseInt((surplus / quota) * 100 ) / 100).toFixed(10))
+            percent: Number(((surplus / quota)).toFixed(10))
           })
           if (this.chartData.length !== 0) {
-            
             this.setCharts(num / quota)
           }
         },
@@ -61,9 +57,8 @@
             this.chart = new Chart({
               container: 'container_' + this.data.username, // 指定图表容器 ID
               autoFit: true,
-              width:260,
-              height: 260,
-              FacetTitle: '123'
+              width:270,
+              height: 280,
             });
             this.chart.coordinate('theta', {
               radius: 0.75,
@@ -71,7 +66,10 @@
             });
             // Step 2: 载入数据源
             this.chart.data(this.chartData);
-
+            this.chart.legend({
+              position: 'bottom',
+              shape : 'circle'
+            })
             this.chart.scale('percent', {
               formatter: val => {
                 val = val * 100 + '%';
@@ -98,8 +96,8 @@
                   fill: '#8c8c8c',
                   textAlign: 'center',
                 },
-                offsetX: -4,
-                offsetY: 20,
+                offsetX: -5,
+                offsetY: 15,
               })
               .text({
                 position: ['50%', '50%'],
@@ -109,8 +107,8 @@
                   fill: number >= 0.75  ? '#f40' : '#8c8c8c',
                   textAlign: 'center',
                 },
-                offsetX: -4,
-                offsetY: -10,
+                offsetX: 0,
+                offsetY: -15,
               })
             this.chart
             .interval()
@@ -139,9 +137,9 @@
 
 <style lang="less"  >
 .title{
- 
   color: #666;
   margin-top: 10px;
+  text-align: center;
   line-height: 22px;
 }
 </style>

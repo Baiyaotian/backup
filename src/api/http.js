@@ -1,16 +1,17 @@
 import axios from "axios"
 import router from "../router"
 import Vue from 'vue'
-import {Message, Loading } from 'element-ui'
+import { Message, Loading } from 'element-ui'
 import Cookies from 'js-cookie'
 let loadingServer
 // 超时时间
 axios.defaults.timeout = 10000;
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+axios.defaults.headers.common['Cache-Control'] = 'no-cache'
 if (process.env.NODE_ENV === "development") {
   axios.defaults.baseURL = '/'
   // axios.defaults.baseURL = 'api/'
-} else if (process.env.NODE_ENV === "production"){
+} else if (process.env.NODE_ENV === "production") {
   axios.defaults.baseURL = '/'
 }
 // 允许axios携带cookie
@@ -19,6 +20,7 @@ axios.defaults.withCredentials = true
 axios.interceptors.request.use(
   config => {
     loadingServer = Loading.service()
+    // console.log(config)
     return config
   },
   error => {
@@ -40,7 +42,6 @@ axios.interceptors.response.use(
           break
         case 401:
           error.message = "未授权，请登录";
-          // sessionStorage.removeItem('token')
           Cookies.remove('access_token')
           router.push({
             name: 'login'
@@ -91,9 +92,8 @@ export default {
     return new Promise((resolve, reject) => {
       let token = window.sessionStorage.getItem("token")
       if (token) {
-     
-      axios
-          .get(url,{ params:params})
+        axios
+          .get(url, { params: params })
           .then(response => {
             resolve(response.data)
           })
@@ -102,7 +102,7 @@ export default {
           })
       } else {
         axios
-          .get(url, {params})
+          .get(url, { params })
           .then(response => {
             resolve(response.data)
           })
@@ -112,12 +112,13 @@ export default {
       }
     })
   },
-  post: (url, data, headers) => {
+  post: (url, data, config) => {
     return new Promise((resolve, reject) => {
       axios
         .post(
           url,
-          data
+          data,
+          config
         )
         .then(
           response => {
@@ -132,7 +133,7 @@ export default {
   delete: (url, params) => {
     return new Promise((resolve, reject) => {
       axios
-        .delete(url,  { params }, {
+        .delete(url, { params }, {
           withCredentials: true
         })
         .then(response => {
@@ -146,7 +147,7 @@ export default {
   patch: (url, data) => {
     return new Promise((resolve, reject) => {
       axios
-        .patch(url, data, )
+        .patch(url, data)
         .then(
           response => {
             resolve(response.data)

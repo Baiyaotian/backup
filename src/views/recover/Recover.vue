@@ -15,7 +15,7 @@
 									style="width: 150px"
 								>
 									<el-option label="备份名称" value="backupName"></el-option>
-									<el-option label="恢复客户端IP" value="ip"></el-option>
+									<el-option label="恢复客户端IP" value="client"></el-option>
 								</el-select>
 								<el-button slot="append" icon="el-icon-search" @click.native="searchclick"></el-button>
 							</el-input>
@@ -31,14 +31,14 @@
 				ref="backTable"
 				@row-click="tableRowClick"
 				@sort-change="tableSortChange"
-        @filter-change="tableFilter"
+				@filter-change="tableFilter"
 			>
 				<el-table-column label="Id" prop="id" align="center" min-width="60px"></el-table-column>
 				<el-table-column prop="backupRecordId" align="center" min-width="60px" label="备份历史Id"></el-table-column>
 				<el-table-column prop="backupName" align="center" min-width="80" label="备份名称"></el-table-column>
 				<el-table-column
 					prop="recovertype"
-          column-key="recovertype"
+					column-key="recovertype"
 					align="center"
 					min-width="60"
 					label="类型"
@@ -71,13 +71,13 @@
 									size="small"
 									type="danger"
 									icon="el-icon-delete"
-                  :disabled="scope.row.state === '等待中' || scope.row.state === '运行中'"
+									:disabled="scope.row.state === '等待中' || scope.row.state === '运行中'"
 								></el-button>
 							</el-tooltip>
 							<el-tooltip class="item" effect="dark" content="中断" placement="top-start">
 								<el-button
 									@click="interRecovery(scope.row)"
-                  :disabled="scope.row.state !== '等待中' && scope.row.state !== '运行中'"
+									:disabled="scope.row.state !== '等待中' && scope.row.state !== '运行中'"
 									size="small"
 									icon="iconfont icon-Interrupts"
 									class="tiggerbtn"
@@ -91,14 +91,14 @@
 						<div class="this-backgroundcol" :span="24">
 							<el-row>
 								<el-col :span="12">id: {{scope.row.id}}</el-col>
-								<el-col :span="12">uuid: {{scope.row.backupRecordId}}</el-col>
+								<el-col :span="12">uuid: {{scope.row.uuid}}</el-col>
 							</el-row>
 							<el-row>
 								<el-col :span="12">备份名称: {{scope.row.backupName}}</el-col>
 								<el-col :span="12">类型: {{scope.row.recovertype}}</el-col>
 							</el-row>
 							<el-row>
-								<el-col :span="12">恢复客户IP: {{scope.row.ip}}</el-col>
+								<el-col :span="12">恢复客户IP: {{scope.row.client}}</el-col>
 								<el-col :span="12">租户: {{scope.row.username}}</el-col>
 							</el-row>
 						</div>
@@ -125,7 +125,8 @@
 								<el-col :span="12">恢复历史:</el-col>
 							</el-row>
 							<el-row>
-								<el-col :span="12">{{scope.row.recovertype === '文件' ? '备份路径' : '备份脚本'}}: {{scope.row.data}}</el-col>
+								<el-col :span="12">{{scope.row.recovertype === '文件' ? '恢复路径' : '恢复脚本'}}: {{scope.row.data.data}}</el-col>
+								<el-col :span="12">挂载点: {{scope.row.data.mountPoint}}</el-col>
 								<el-col :span="12">结束时间: {{scope.row.endTime}}</el-col>
 							</el-row>
 						</div>
@@ -143,9 +144,9 @@
 				<el-pagination
 					:current-page="currentPages"
 					@current-change="handleCurrentChange"
-          @size-change="hanldleSizeChange"
+					@size-change="hanldleSizeChange"
 					:page-size="10"
-          :page-sizes="[10, 20, 50]"
+					:page-sizes="[10, 20, 50]"
 					layout="sizes, prev, pager, next, jumper"
 					:total="total"
 				></el-pagination>
@@ -174,11 +175,11 @@
 				input3: "",
 				select: "",
 				maxHeight: document.documentElement.clientHeight - 220,
-        total: 0,
-        size: 10,
+				total: 0,
+				size: 10,
 				sort: "",
-        order: "",
-        backupFilters: []
+				order: "",
+				backupFilters: []
 			};
 		},
 
@@ -201,16 +202,19 @@
 				});
 			},
 			getRecoery(page, field, value, sort, order) {
+				if (field === "client") {
+					value = btoa(value);
+				}
 				let objData =
 					field && value
 						? {
-                page: page,
-                size:this.size,
+								page: page,
+								size: this.size,
 								[field]: value
 						  }
 						: {
-                page,
-                size:this.size,
+								page,
+								size: this.size
 						  };
 				recovery({
 					...objData,
@@ -274,31 +278,37 @@
 				);
 			},
 			interRecovery(item) {
-        this.$confirm(
-					`此操作将中断ID为${item.id}的恢复任务, 是否继续?`,
-					"提示",
-					{ type: "warning" }
-				)
+				this.$confirm(`此操作将中断ID为${item.id}的恢复任务, 是否继续?`, "提示", {
+					type: "warning"
+				})
 					.then(() => {
 						interruptRecovery(item.id, {
-              option: "interrupt"
-            }).then(res => {
-              this.getRecoery(
-                this.currentPages,
-                this.select,
-                this.input3,
-                this.sort,
-                this.order
-              );
-            });
+							option: "interrupt"
+						}).then(res => {
+							this.getRecoery(
+								this.currentPages,
+								this.select,
+								this.input3,
+								this.sort,
+								this.order
+							);
+						});
 					})
 					.catch(() => {
 						this.$message.info("已取消操作!");
 					});
-				
 			},
 			tableRowClick(row) {
-				console.log(row);
+				// console.log(row)
+				if (row.data && row.data !== '""') {
+					if (typeof row.data === "string") {
+						row.data = JSON.parse(row.data);
+						// if (row.recovertype === '文件') {
+						// 	// row.data.exclude = row.data.data.join(", ");
+						// 	// row.data.mountPoint = row.data.mountPoint.join(", ");
+						// }
+					}
+				}
 				this.tableData.forEach(item => {
 					if (item.uuid !== row.uuid) {
 						this.$refs.backTable.toggleRowExpansion(item, false);
@@ -336,9 +346,9 @@
 					this.sort,
 					this.order
 				);
-      },
-      hanldleSizeChange (sizes) {
-				this.size = sizes
+			},
+			hanldleSizeChange(sizes) {
+				this.size = sizes;
 				this.getRecoery(
 					this.currentPages,
 					this.select,
@@ -346,11 +356,17 @@
 					this.sort,
 					this.order
 				);
-      },
-      tableFilter (filters) {
-        console.log(Object.values(filters).flat(), Object.keys(filters))
-        this.getRecoery(this.currentPages,	'type',	Object.values(filters).flat()[0],	this.sort,	this.order);
 			},
+			tableFilter(filters) {
+				console.log(Object.values(filters).flat(), Object.keys(filters));
+				this.getRecoery(
+					this.currentPages,
+					"type",
+					Object.values(filters).flat()[0],
+					this.sort,
+					this.order
+				);
+			}
 		},
 		mounted() {
 			this.getRecoery(
@@ -396,8 +412,8 @@
 	color: #fff;
 }
 .tiggerbtn.is-disabled {
-  color: #fff;
-  background-color: rgba(255, 201, 0, .4)
+	color: #fff;
+	background-color: rgba(255, 201, 0, 0.4);
 }
 .el-row {
 	font-size: 12px;
@@ -409,5 +425,8 @@
 }
 .this-backgroundcol {
 	padding: 10px 10px;
+}
+.block {
+	margin-top: 10px;
 }
 </style>

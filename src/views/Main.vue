@@ -1,24 +1,5 @@
 <template>
 	<div id="app" class>
-		<!-- <el-container>
-      <el-container>
-		<el-header style="padding:0">-->
-		<!-- <div style="height:60px; line-height:60px; width:290px; display: inline-block">自动化备份系统 KKBackup</div> -->
-		<!-- </el-header>
-        <el-main style="position: relative">
-            
-          <el-main style="margin-left: 300px">
-            
-          </el-main>
-        </el-main>
-        <el-footer>
-            <el-row>
-              <el-col>KKBackup v0.1</el-col>
-            </el-row>
-        </el-footer>
-        
-      </el-container>
-		</el-container>-->
 		<el-container>
 			<el-header>
 				<div
@@ -39,6 +20,7 @@
 					<el-menu-item index="/history_index">备份历史</el-menu-item>
 					<el-menu-item index="/recover_index">恢复历史</el-menu-item>
 				</el-menu>
+				<a :href="`${this.api}api/log`" class="download-log"><el-button style="right:140px" >日志下载</el-button></a>
 				<el-button style="right:75px" @click="clean">清理</el-button>
 				<el-button style="right:10px" @click="loginOut">注销</el-button>
 			</el-header>
@@ -80,8 +62,7 @@
 		},
 		data() {
 			return {
-        
-				active: JSON.parse(localStorage.getItem("active")) || "/"
+				api: ''
 			};
 		},
 		methods: {
@@ -105,9 +86,9 @@
 			}
 		},
 		mounted() {
-			let Api =	process.env.NODE_ENV === "development"	? '/'	: CONFIG.baseURL;
+			this.api =	'/';
 			const EventSource = NativeEventSource || EventSourcePolyfill;
-			let es = new EventSource(`${Api}api/event`, { withCredentials: true });
+			let es = new EventSource(`${this.api}api/event`, { withCredentials: true });
 			es.addEventListener("message", e => {
 				console.log(e)
 				this.$notify({
@@ -121,27 +102,13 @@
 </script>
 
 <style lang="less">
-.bruce {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 100%;
-	background: linear-gradient(135deg, #f66, #f90, #3c9, #09f, #66f) left
-		center/400% 400%;
-	animation: move 10s infinite;
-}
 body {
 	margin: 0;
 	padding: 0;
 }
 #app {
-	font-family: Avenir, Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	text-align: center;
-	color: #2c3e50;
-	margin: 0;
-	padding: 0;
+	width: 100%;
+	height: 100%;
 }
 .bigtitle {
 	-webkit-box-shadow: inset 1px 1px 2px rgba(238, 238, 238, 0.2);
@@ -170,7 +137,6 @@ body {
 .el-aside {
 	background-color: #d3dce6;
 	color: #333;
-	text-align: center;
 	.topcanvas {
 		overflow: hidden;
 	}
@@ -190,13 +156,7 @@ body {
 body > .el-container {
 	margin-bottom: 40px;
 }
-
-.el-container:nth-child(5) .el-aside,
-.el-container:nth-child(6) .el-aside {
-	line-height: 260px;
-}
-
-.el-container:nth-child(7) .el-aside {
-	line-height: 320px;
+.download-log {
+	display: block;
 }
 </style>

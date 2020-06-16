@@ -1,7 +1,7 @@
 <template>
   <div class="carousel">
-    <el-carousel height="365px" >
-      <el-carousel-item v-for="(item, index) in list" :key="index" :interval="100000" :autoplay="false" indicator-position="outside">
+    <el-carousel height="380px" :interval="100000" :autoplay="false" indicator-position="outside">
+      <el-carousel-item v-for="(item, index) in usageList" :key="index" >
         <RingChart :canvasData="item"></RingChart>
       </el-carousel-item>
     </el-carousel>
@@ -12,78 +12,37 @@
 import { Carousel, Select } from 'element-ui'
 import { usage } from '@/api/api'
 import RingChart from '../components/ringchart'
+import { getUsage } from '@/utils/json/data'
+import { mapMutations, mapState } from 'vuex'
 export default {
   data () {
     return {
-      list: [
-        // {
-        //   username: "icbc",
-        //   endpoint: "172.16.155.201:7480",
-        //   quota: 200,
-        //   displayName: "icbc",
-        //   usages: {
-        //     Entries: [ ],
-        //     Summary: [
-        //       231,
-        //       4096,
-        //       183
-        //     ],
-        //     CapacityUsed: [
-        //       {
-        //         Buckets: [
-        //           {
-        //             Bucket: "bucket-1",
-        //             Bytes: 231,
-        //             Bytes_Rounded: 4096
-        //         },
-        //         {
-        //           Bucket: "bucket-2",
-        //           Bytes: 0,
-        //           Bytes_Rounded: 0
-        //         },
-        //         {
-        //           Bucket: "bucket_1",
-        //           Bytes: 0,
-        //           Bytes_Rounded: 0
-        //           }
-        //         ]	
-        //       }
-        //     ]
-        //   }
-        // },
-        // {
-        //   username: "s3user",
-        //   endpoint: "172.16.155.201:7480",
-        //   quota: 100,
-        //   displayName: "s3user",
-        //   usages: {
-        //     Entries: [ ],
-        //     Summary: [
-        //       0,
-        //       0,
-        //       0
-        //     ],
-        //     CapacityUsed: [
-        //       {
-        //       Buckets: [ ]
-        //       }
-        //     ]
-        //   }
-        // }
-      ]
+      list: []
     }
   },
   mounted () {
+    // console.log(getUsage())
+    // this.list = getUsage()
     usage().then(res => {
-      console.log(res);
       this.list = res
+      this.setUsages(this.list)
     }).catch(err => {
-
+      this.$message.error(err.message)
     })
+  },
+  methods: {
+    ...mapMutations([
+      'setUsages'
+    ])
   },
   components: {
     RingChart,
   },
+  computed: {
+    ...mapState({
+      usageList: 'usageList'
+    })
+  }
 }
 </script>
 
@@ -117,6 +76,9 @@ export default {
   .el-carousel {
     .el-carousel__indicators {
       bottom: -8px;
+    }
+    .el-carousel__arrow {
+      display: none;
     }
   }
 }

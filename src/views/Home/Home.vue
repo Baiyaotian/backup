@@ -444,19 +444,17 @@
 			},
 			tableRowClick(row) {
 				if (row.backupData && row.backupData !== '""') {
-					console.log(row.backupData);
 					if (typeof row.backupData === "string") {
 						row.backupData = JSON.parse(row.backupData);
-						row.backupData.exclude = row.backupData.exclude.join(", ");
-						row.backupData.include = row.backupData.include.join(", ");
+						if (row.backupGroup === '文件') {
+							row.backupData.exclude = row.backupData.exclude.join(", ");
+							row.backupData.include = row.backupData.include.join(", ");
+						}
 					}
 				}
 				this.tableData.forEach(item => {
 					if (item.uuid !== row.uuid) {
 						this.$refs.backTable.toggleRowExpansion(item, false);
-					}
-					if (item.id !== row.id) {
-						this.$refs.HistoryTable.toggleRowExpansion(item, false);
 					}
 				});
 				this.$refs.backTable.toggleRowExpansion(row);
@@ -580,6 +578,9 @@ body {
 	}
 	.marginleft {
 		margin-left: 100px;
+	}
+	.block {
+		margin-top: 10px;
 	}
 }
 </style>

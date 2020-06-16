@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '@/views/login.vue'
-import Home from '@/views/Home/Home.vue'
+// import Home from '@/views/Home/Home.vue'
 import Main from '@/views/Main.vue'
 import Cookies from 'js-cookie'
 Vue.use(VueRouter)
@@ -26,7 +26,7 @@ Vue.use(VueRouter)
         {
           path:'/home_index',
           name:'home',
-          component: Home
+          component: () => import('@/views/Home/Home.vue')
         },
         {
           path:'/history_index',
@@ -54,6 +54,7 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, form, next) => {
+  // next()
   if (to.name !== 'login' && !Cookies.get('access_token')){
     next({
       name: 'login'
@@ -65,7 +66,6 @@ router.beforeEach((to, form, next) => {
   } else {
     next()
   }
-  // sessionStorage.clear()
 })
 
 export default router
